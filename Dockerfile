@@ -1,7 +1,5 @@
 FROM goacme/lego:v4.10.2
 
-ENV DOCKER_HOST=unix:///var/run/docker.sock
-
 VOLUME /.lego # Save certs and account to external volume
 
 COPY app/crontab /var/spool/cron/crontabs/root
