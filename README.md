@@ -1,4 +1,8 @@
-This repository is a tiny wrapper around the awesome [Lego ACME](https://github.com/go-acme/lego) client. It adds automatic certificat renew support which is currently missing from the official [Lego Docker image](https://hub.docker.com/r/goacme/lego/). It does so by using cron to periodically invoke the client to update the certificates. Migrating to this image from an existing setup is straightforward: The command fed to the image is passed to the `run` or `renew` command respectively. Because of this the image is also very future proof since all commands and arguments are passed directly to the original client.
+[![GitHub release](https://img.shields.io/github/v/release/cilenco/lego-cron-wrapper)](https://github.com/cilenco/lego-cron-wrapper/releases)
+[![Docker Image Size](https://img.shields.io/docker/image-size/cilenco/lego-cron-wrapper?sort=semver)](https://hub.docker.com/r/cilenco/lego-cron-wrapper "Click to view the image on Docker Hub")
+[![Docker pulls](https://img.shields.io/docker/pulls/cilenco/lego-cron-wrapper.svg)](https://hub.docker.com/r/cilenco/lego-cron-wrapper 'DockerHub')
+
+This repository is a tiny wrapper around the awesome [Lego ACME](https://github.com/go-acme/lego) client. It adds automatic certificat renew support which is currently missing from the official Lego Docker image. It does so by using cron to periodically invoke the client to update the certificates. Migrating to this image from an existing setup is straightforward: The command fed to the image is passed to the `run` or `renew` command respectively. Because of this the image is also very future proof since all commands and arguments are passed directly to the original client.
 
 ### Usage with [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy)
 
