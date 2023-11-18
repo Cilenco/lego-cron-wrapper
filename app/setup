@@ -1,0 +1,13 @@
+#!/bin/sh
+
+rm -f app/renew
+
+echo "cd /" >> app/renew # so lego can find account
+echo "/lego $@ renew $RENEW_ARGUMENTS" >> app/renew
+
+chmod +x /app/renew
+
+#Fetch certificates first time
+/lego "$@" run $RUN_ARGUMENTS
+
+crond -f
