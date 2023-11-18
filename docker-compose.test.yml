@@ -1,0 +1,44 @@
+version: "2"
+services:
+  pebble:
+    image: letsencrypt/pebble:latest
+    ports:
+      - 14000:14000
+    networks:
+      acmenet:
+        ipv4_address: 10.30.50.2
+    extra_hosts:
+      - domain.tld:10.30.50.3
+    volumes:
+      - ca-cert:/test/certs
+  acme-client:
+    build: .
+    depends_on:
+      - pebble
+    command: >
+      --server=https://pebble:14000/dir --http --http.port=:5002
+      --email=mail@domain.tld --domains=domain.tld --accept-tos
+    ports:
+      - 5002:5002
+    environment:
+      - RUN_ARGUMENTS=--run-hook=/app/deploy
+      - LEGO_CA_CERTIFICATES=/pebble/pebble.minica.pem
+      - RENEW_ARGUMENTS=--renew-hook=/app/deploy
+    volumes:
+      - ca-cert:/pebble
+      - ./certs:/app/certificates
+      - ./deploy.sh:/app/deploy
+    networks:
+      acmenet:
+        ipv4_address: 10.30.50.3
+
+volumes:
+  ca-cert:
+
+networks:
+  acmenet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.30.50.0/24
