@@ -32,7 +32,7 @@ services:
     environment:
       - RUN_ARGUMENTS=--run-hook=/app/deploy
       - LEGO_CA_CERTIFICATES=/pebble/pebble.minica.pem
-      - RENEW_ARGUMENTS=--renew-hook=/app/deploy
+      - RENEW_ARGUMENTS=--renew-hook=/app/deploy --no-random-sleep
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./deploy.test.sh:/app/deploy
