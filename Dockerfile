@@ -11,4 +11,6 @@ RUN apk add curl
 COPY app/setup /app/setup
 RUN chmod +x /app/setup
 
+STOPSIGNAL SIGKILL
+
 ENTRYPOINT ["/app/setup"]
