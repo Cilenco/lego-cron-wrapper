@@ -2,7 +2,7 @@
 
 FILE_NAME="${LEGO_CERT_DOMAIN#\*.}"
 
-# If file exists this was a renew call => check dates
+# If file exists this was a renew call, stop container
 if test -f /app/certificates/run_$FILE_NAME.crt; then
     cp -f $LEGO_CERT_PATH /app/certificates/renew_$FILE_NAME.crt
     cp -f $LEGO_CERT_KEY_PATH /app/certificates/renew_$FILE_NAME.key
