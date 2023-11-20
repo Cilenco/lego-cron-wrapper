@@ -1,9 +1,18 @@
 version: "2"
 services:
   pebble:
-    image: letsencrypt/pebble:latest
+    build: 
+      context: https://github.com/letsencrypt/pebble.git#v2.4.0
+      dockerfile: docker/pebble/linux.Dockerfile
+    container_name: pebble
+    command: pebble -config /pebble-config.json
     ports:
       - 14000:14000
+    healthcheck:
+      test: "wget --no-check-certificate -q --spider https://0.0.0.0:14000/dir"
+      interval: 5s
+      timeout: 5s
+      retries: 3
     networks:
       acmenet:
         ipv4_address: 10.30.50.2
@@ -11,10 +20,10 @@ services:
       - domain.tld:10.30.50.3
     volumes:
       - ca-cert:/test/certs
+      - ./pebble-config.json:/pebble-config.json
   acme-client:
-    build: .
-    depends_on:
-      - pebble
+    build: ./..
+    container_name: client
     command: >
       --server=https://pebble:14000/dir --http --http.port=:5002
       --email=mail@domain.tld --domains=domain.tld --accept-tos
@@ -23,11 +32,15 @@ services:
     environment:
       - RUN_ARGUMENTS=--run-hook=/app/deploy
       - LEGO_CA_CERTIFICATES=/pebble/pebble.minica.pem
-      - RENEW_ARGUMENTS=--renew-hook=/app/deploy
+      - RENEW_ARGUMENTS=--renew-hook=/app/deploy --no-random-sleep
     volumes:
-      - ca-cert:/pebble
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./deploy.test.sh:/app/deploy
       - ./certs:/app/certificates
-      - ./deploy.sh:/app/deploy
+      - ca-cert:/pebble
+    depends_on:
+      pebble:
+        condition: service_healthy
     networks:
       acmenet:
         ipv4_address: 10.30.50.3
