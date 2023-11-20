@@ -1,0 +1,40 @@
+name: Test Docker image
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test_new_image:
+    name: Test new Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Make folders
+        run: mkdir test/certs
+
+      - name: Start containers
+        run: docker compose -f "test/docker-compose.yml" up --exit-code-from acme-client
+        timeout-minutes: 15 # Containers should terminate during this timeframe or exit
+
+      - name: Check all files exist
+        run: |
+          test -e test/certs/run_domain.tld.crt || exit 1
+          test -e test/certs/run_domain.tld.key || exit 1
+          test -e test/certs/new_domain.tld.crt || exit 1
+          test -e test/certs/new_domain.tld.key || exit 1
+
+      - name: Check expiration dates
+        run: |
+          RUN_CERT_DATE=$(sudo openssl x509 -enddate -noout -in test/certs/run_domain.tld.crt)
+          NEW_CERT_DATE=$(sudo openssl x509 -enddate -noout -in test/certs/new_domain.tld.crt)
+
+          RUN_CERT_DATE=$(echo $RUN_CERT_DATE | sed "s/notAfter=//")
+          NEW_CERT_DATE=$(echo $NEW_CERT_DATE | sed "s/notAfter=//")
+
+          RUN_CERT_DATE=$(date -d "$RUN_CERT_DATE" +%s)
+          NEW_CERT_DATE=$(date -d "$NEW_CERT_DATE" +%s)
+
+          test $RUN_CERT_DATE -lt $NEW_CERT_DATE || exit 1
