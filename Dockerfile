@@ -1,6 +1,7 @@
 FROM goacme/lego:v4.16.1
 
-VOLUME /.lego # Save certs and account to external volume
+# Save certs and account to external volume
+VOLUME /.lego 
 
 COPY app/crontab /var/spool/cron/crontabs/root
 RUN chown -R root:root /var/spool/cron/crontabs/root
