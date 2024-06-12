@@ -1,4 +1,4 @@
-FROM goacme/lego:v4.17.3
+FROM goacme/lego:v4.17.4
 
 # Save certs and account to external volume
 VOLUME /.lego 
